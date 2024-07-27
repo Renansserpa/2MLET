@@ -4,3 +4,4 @@ utils
 gitignore
 .venv
 utils
+*.gitignore
