@@ -25,6 +25,7 @@ def http_get(url: str, aba: str, subopcao: Optional[str]  = None, ano: Optional[
         ano {Optional[str]} -- Se este parâmetro for informado, adicona o parâmetro "ano" na requisição.
     """
     response = requests.get(url, params= {'opcao': abas[aba], 'subopcao': subopcao, 'ano': ano})
+    response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup
 
