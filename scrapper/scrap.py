@@ -1,6 +1,7 @@
+#%%
 import requests
 import pandas as pd
-from requests.exceptions import HTTPError
+import pandas.api.types as ptypes
 from bs4 import BeautifulSoup
 import re
 from typing import Optional
@@ -38,7 +39,10 @@ def get_available_suboptions(embrapa_url: str, aba: str) -> dict[str,str]:
         aba {str} -- Chave do dicionário "abas". Informe com base em qual aba do site da embrapa gostaria de fazer a requisição.
     """
     soup = http_get(embrapa_url, aba)
-    return {f'subopt_0{n +1}': sub_option.text for n, sub_option in enumerate(soup.find_all('button', 'btn_sopt'))}
+    sub_options = {f'subopt_0{n +1}': sub_option.text for n, sub_option in enumerate(soup.find_all('button', 'btn_sopt'))}
+    
+    assert sub_options, f'Subopções da aba {aba} não encontradas'
+    return sub_options
 
 def get_available_years(embrapa_url: str, aba: str, subopcao: Optional[str]  = None):
     """Realiza requisição GET na url informada com parâmetros adicionados e retorna a faixa de anos em que há dados disponíveis
@@ -51,6 +55,7 @@ def get_available_years(embrapa_url: str, aba: str, subopcao: Optional[str]  = N
     soup = http_get(embrapa_url, aba, subopcao)
     periodo_busca = soup.find_all('label','lbl_pesq')[0].text
     ano_inicio, ano_fim = re.findall(r'\[(\d{4})-(\d{4})\]', periodo_busca)[0]
+    
     return ano_inicio, ano_fim
 
 def structure_table(soup: BeautifulSoup, table_attr: str) -> pd.DataFrame:
@@ -96,8 +101,14 @@ def scrap_producao() -> pd.DataFrame:
         soup = http_get(url =embrapa_url, aba = aba, ano = ano)
         df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano)
         dfs.append(df)
+    dfs = pd.concat(dfs)
     
-    return pd.concat(dfs)
+    assert dfs.shape[0] > 1, f'Tabela de dados da aba {aba} está vazia'
+    assert list(dfs.columns) == ['Produto', 'Quantidade (L.)', 'ano'], 'Nomes de colunas obtidas do site não satisfazem os valores padrão de "Produto", "Quantidade (L.)", e "ano"'
+    assert ptypes.is_string_dtype(dfs['Produto']), 'Tipo da coluna Produto não é string'
+    assert ptypes.is_string_dtype(dfs['Quantidade (L.)']), 'Tipo da coluna Quantidade não é string'
+    assert ptypes.is_numeric_dtype(dfs['ano']), 'Tipo da coluna ano não é numérico'
+    return dfs
 
 
 def scrap_processamento() -> pd.DataFrame:
@@ -123,8 +134,15 @@ def scrap_processamento() -> pd.DataFrame:
                 df = df.rename(columns = {'Sem definição':'Cultivar'})
                 
             dfs.append(df)
+    dfs = pd.concat(dfs)
     
-    return pd.concat(dfs)
+    assert dfs.shape[0] > 1, f'Tabela de dados da aba {aba} está vazia'
+    assert list(dfs.columns) == ['Cultivar', 'Quantidade (Kg)', 'ano', 'classificacao_uva'], 'Nomes de colunas obtidas do site não satisfazem os valores padrão de "Cultivar", "Quantidade (Kg)", "ano", e "classificacao_uva"'
+    assert ptypes.is_string_dtype(dfs['Cultivar']), 'Tipo da coluna Cultivar não é string'
+    assert ptypes.is_string_dtype(dfs['Quantidade (Kg)']), 'Tipo da coluna Quantidade não é string'
+    assert ptypes.is_numeric_dtype(dfs['ano']), 'Tipo da coluna ano não é numérico'
+    assert ptypes.is_string_dtype(dfs['classificacao_uva']), 'Tipo da coluna classificacao_uva não é string'
+    return dfs
 
 
 def scrap_comercializacao() -> pd.DataFrame:
@@ -139,8 +157,14 @@ def scrap_comercializacao() -> pd.DataFrame:
         soup = http_get(url =embrapa_url, aba = aba, ano = ano)
         df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano)
         dfs.append(df)
+    dfs = pd.concat(dfs)
     
-    return pd.concat(dfs)
+    assert dfs.shape[0] > 1, f'Tabela de dados da aba {aba} está vazia'
+    assert list(dfs.columns) == ['Produto', 'Quantidade (L.)', 'ano'], 'Nomes de colunas obtidas do site não satisfazem os valores padrão de "Produto", "Quantidade (L.)", e "ano"'
+    assert ptypes.is_string_dtype(dfs['Produto']), 'Tipo da coluna Produto não é string'
+    assert ptypes.is_string_dtype(dfs['Quantidade (L.)']), 'Tipo da coluna Quantidade não é string'
+    assert ptypes.is_numeric_dtype(dfs['ano']), 'Tipo da coluna ano não é numérico'
+    return dfs
 
 
 def scrap_importacao() -> pd.DataFrame:
@@ -161,8 +185,16 @@ def scrap_importacao() -> pd.DataFrame:
             df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano).assign(classificacao_derivado = sub_options[sub_option])
                 
             dfs.append(df)
+    dfs = pd.concat(dfs)
     
-    return pd.concat(dfs)
+    assert dfs.shape[0] > 1, f'Tabela de dados da aba {aba} está vazia'
+    assert list(dfs.columns) == ['Países', 'Quantidade (Kg)', 'Valor (US$)', 'ano','classificacao_derivado'], 'Nomes de colunas obtidas do site não satisfazem os valores padrão de "Países", "Quantidade (Kg)", "Valor (US$)", "ano" e "classificacao_derivado"'
+    assert ptypes.is_string_dtype(dfs['Países']), 'Tipo da coluna Países não é string'
+    assert ptypes.is_string_dtype(dfs['Quantidade (Kg)']), 'Tipo da coluna Quantidade não é string'
+    assert ptypes.is_string_dtype(dfs['Valor (US$)']), 'Tipo da coluna Valor (US$) não é string'
+    assert ptypes.is_numeric_dtype(dfs['ano']), 'Tipo da coluna ano não é numérico'
+    assert ptypes.is_string_dtype(dfs['classificacao_derivado']), 'Tipo da coluna classificacao_derivado não é string'
+    return dfs
 
 
 def scrap_exportacao() -> pd.DataFrame:
@@ -183,5 +215,13 @@ def scrap_exportacao() -> pd.DataFrame:
             df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano).assign(classificacao_derivado = sub_options[sub_option])
                 
             dfs.append(df)
+    dfs = pd.concat(dfs)
     
-    return pd.concat(dfs)
+    assert dfs.shape[0] > 1, f'Tabela de dados da aba {aba} está vazia'
+    assert list(dfs.columns) == ['Países', 'Quantidade (Kg)', 'Valor (US$)', 'ano','classificacao_derivado'], 'Nomes de colunas obtidas do site não satisfazem os valores padrão de "Países", "Quantidade (Kg)", "Valor (US$)", "ano" e "classificacao_derivado"'
+    assert ptypes.is_string_dtype(dfs['Países']), 'Tipo da coluna Países não é string'
+    assert ptypes.is_string_dtype(dfs['Quantidade (Kg)']), 'Tipo da coluna Quantidade não é string'
+    assert ptypes.is_string_dtype(dfs['Valor (US$)']), 'Tipo da coluna Valor (US$) não é string'
+    assert ptypes.is_numeric_dtype(dfs['ano']), 'Tipo da coluna ano não é numérico'
+    assert ptypes.is_string_dtype(dfs['classificacao_derivado']), 'Tipo da coluna classificacao_derivado não é string'
+    return dfs
