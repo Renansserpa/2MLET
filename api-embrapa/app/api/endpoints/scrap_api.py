@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from app.scraping.scrap import scrap_producao, scrap_processamento, scrap_comercializacao, scrap_importacao, scrap_exportacao 
+from app.scrapper.scrap import scrap_producao, scrap_processamento, scrap_comercializacao, scrap_importacao, scrap_exportacao 
 from app.core.database import SessionLocal
 from app.models.production_scraped_data import ProductionScrapedData
 from app.models.comercialization_scraped_data import ComercializationScrapedData    
@@ -30,9 +30,9 @@ def api_scrape_producao(ano: Optional[int] = Query(None), db: Session = Depends(
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
 
     if ano is None:
-        data = scrap_producao(None, None)
+        data = scrap_producao()
     else:
-        data = scrap_producao(ano, ano)
+        data = scrap_producao()
     
     if data.empty:
         raise HTTPException(status_code=400, detail='Failed to scrape production data')
@@ -42,7 +42,7 @@ def api_scrape_producao(ano: Optional[int] = Query(None), db: Session = Depends(
     for _, row in data.iterrows():
         db_data = ProductionScrapedData(
             title=row['Produto'],
-            year=row['ano'],
+            ano=row['ano'],
             quantity=row['Quantidade (L.)']
         )
         db.add(db_data)
@@ -60,10 +60,7 @@ def api_scrap_comercializacao(ano: Optional[int] = Query(None), db: Session = De
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
 
-    if ano is None:
-        data = scrap_comercializacao(None, None)
-    else:
-        data = scrap_comercializacao(ano, ano)
+    data = scrap_comercializacao()
 
     if data.empty:
         raise HTTPException(status_code=400, detail='Failed to scrape comercialization data')
@@ -73,7 +70,7 @@ def api_scrap_comercializacao(ano: Optional[int] = Query(None), db: Session = De
     for _, row in data.iterrows():
         db_data = ComercializationScrapedData(
             title=row['Produto'],
-            year=row['ano'],
+            ano=row['ano'],
             quantity=row['Quantidade (L.)']
         )
         db.add(db_data)
@@ -91,10 +88,8 @@ def api_scrap_processamento(ano: Optional[int] = Query(None), db: Session = Depe
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
 
-    if ano is None:
-        data = scrap_processamento(None, None)
-    else:
-        data =  scrap_processamento(ano, ano)
+
+    data =  scrap_processamento()
 
     if data.empty:
         raise HTTPException(status_code=400, detail='Failed to scrape processing data')
@@ -124,10 +119,7 @@ def api_scrap_importacao(ano: Optional[int] = Query(None), db: Session = Depends
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
 
-    if ano is None:
-        data = scrap_importacao(None, None)
-    else:
-        data =  scrap_importacao(ano, ano)
+    data =  scrap_importacao()
 
     if data.empty:
         raise HTTPException(status_code=400, detail='Failed to scrape importacao data')
@@ -157,10 +149,7 @@ def api_scrap_exportacao(ano: Optional[int] = Query(None), db: Session = Depends
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
 
-    if ano is None:
-        data = scrap_exportacao(None, None)
-    else:
-        data =  scrap_exportacao(ano, ano)
+    data =  scrap_exportacao()
 
     if data.empty:
         raise HTTPException(status_code=400, detail='Failed to scrape exportacao data')
