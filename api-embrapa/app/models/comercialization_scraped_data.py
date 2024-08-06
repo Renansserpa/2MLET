@@ -6,5 +6,5 @@ class ComercializationScrapedData(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255), index=True)
-    year = Column(Integer)
+    ano = Column(Integer)
     quantity = Column(String(255), nullable=True)
