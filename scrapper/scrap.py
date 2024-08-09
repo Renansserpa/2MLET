@@ -95,8 +95,25 @@ def scrap_producao() -> pd.DataFrame:
     for ano in range(int(ano_inicio), int(ano_fim) + 1):
         soup = http_get(url =embrapa_url, aba = aba, ano = ano)
         df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano)
-        dfs.append(df)
+        
+        # Tratamento de dados: eliminação de linhas sem valores e tratamento da coluna com subproduto
+        for index,row in df.iterrows():
+            if row['Produto'].isupper():
+                Classificacao = df.loc[index,'Produto'].capitalize()
+                df.drop(index, inplace=True)
+                df.loc[index,'Classificacao'] = Classificacao
+            elif re.search('-',row['Quantidade (L.)']):
+                df.drop(index, inplace=True)
+            else:
+                df.loc[index,'Classificacao'] = Classificacao
+        df.dropna(axis=0, how='any', subset=None, inplace=True)
+        
+        # Tratamento de dados: Renomeando e reorganizando as colunas
+        df['ano'] = df['ano'].astype(int)
+        df = df.rename(columns={'Produto':'Sub Produto', 'Classificacao':'Produto', 'ano':'Ano'})
+        df = df.reindex(['Produto', 'Sub Produto', 'Quantidade (L.)','Ano'],axis=1)
     
+        dfs.append(df)
     return pd.concat(dfs)
 
 
@@ -121,9 +138,27 @@ def scrap_processamento() -> pd.DataFrame:
             # Altera nome de coluna diferente para o mesmo nome que aparece em outras abas
             if 'Sem definição' in df.columns:
                 df = df.rename(columns = {'Sem definição':'Cultivar'})
-                
+
+            # Tratamento de dados: eliminação de linhas sem valores e tratamento da coluna com subproduto
+            for index,row in df.iterrows():
+                if row['Cultivar'].isupper():
+                    Classificacao = df.loc[index,'Cultivar'].capitalize()
+                    df.drop(index, inplace=True)
+                    df.loc[index,'Classificacao'] = Classificacao
+                elif re.search('-',row['Quantidade (Kg)']):
+                    df.drop(index, inplace=True)
+                elif re.search('Sem classificação',row['Cultivar']):
+                    df.loc[index,'Classificacao'] = 'Sem classificação'
+                else:
+                    df.loc[index,'Classificacao'] = Classificacao
+            df.dropna(axis=0, how='any', subset=None, inplace=True)
+            df['ano'] = df['ano'].astype(int)
+
+            # Tratamento de dados: Renomeando e reorganizando as colunas
+            df = df.rename(columns={'Cultivar':'Tipos Uva', 'classificacao_uva':'Classificacao Uva', 'Classificacao':'Cultivar','ano':'Ano' })
+            df = df.reindex(['Classificacao Uva', 'Cultivar', 'Tipos Uva', 'Quantidade (Kg)','Ano'],axis=1)
+            
             dfs.append(df)
-    
     return pd.concat(dfs)
 
 
@@ -138,8 +173,25 @@ def scrap_comercializacao() -> pd.DataFrame:
     for ano in range(int(ano_inicio), int(ano_fim) + 1):
         soup = http_get(url =embrapa_url, aba = aba, ano = ano)
         df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano)
-        dfs.append(df)
+
+        # Tratamento de dados: eliminação de linhas sem valores e tratamento da coluna com subproduto
+        for index,row in df.iterrows():
+            if row['Produto'].isupper():
+                Classificacao = df.loc[index,'Produto'].capitalize()
+                df.drop(index, inplace=True)
+                df.loc[index,'Classificacao'] = Classificacao
+            elif re.search('-',row['Quantidade (L.)']):
+                df.drop(index, inplace=True)
+            else:
+                df.loc[index,'Classificacao'] = Classificacao
+        df.dropna(axis=0, how='any', subset=None, inplace=True)
+        
+        # Tratamento de dados: Renomeando e reorganizando as colunas
+        df['ano'] = df['ano'].astype(int)
+        df = df.rename(columns={'Produto':'Sub Produto', 'Classificacao':'Produto','ano':'Ano'})
+        df = df.reindex(['Produto', 'Sub Produto', 'Quantidade (L.)','Ano'],axis=1)
     
+        dfs.append(df)
     return pd.concat(dfs)
 
 
@@ -159,9 +211,19 @@ def scrap_importacao() -> pd.DataFrame:
         for ano in range(int(ano_inicio), int(ano_fim) + 1):
             soup = http_get(url =embrapa_url, aba = aba, subopcao = sub_option, ano = ano)
             df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano).assign(classificacao_derivado = sub_options[sub_option])
-                
-            dfs.append(df)
+
+            # Tratamento de dados: eliminação de linhas sem valores
+            for index,row in df.iterrows():
+                if re.search('-',row['Quantidade (Kg)']):
+                    df.drop(index, inplace=True)
+            df.dropna(axis=0, how='any', subset=None, inplace=True)
+            df['ano'] = df['ano'].astype(int)
+
+            # Tratamento de dados: Renomeando e reorganizando as colunas
+            df = df.rename(columns={'classificacao_derivado':'Classificacao Derivado', 'ano':'Ano'})
+            df = df.reindex(['Classificacao Derivado', 'Países', 'Quantidade (Kg)', 'Valor (US$)','Ano'],axis=1)
     
+            dfs.append(df)                   
     return pd.concat(dfs)
 
 
@@ -180,8 +242,18 @@ def scrap_exportacao() -> pd.DataFrame:
         # Iteração para cada ano de cada sub aba, lendo dados da tabela na página e concatenando resultados
         for ano in range(int(ano_inicio), int(ano_fim) + 1):
             soup = http_get(url =embrapa_url, aba = aba, subopcao = sub_option, ano = ano)
-            df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano).assign(classificacao_derivado = sub_options[sub_option])
-                
+            df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano).assign(classificacao_derivado = sub_options[sub_option])               
+
+            # Tratamento de dados: eliminação de linhas sem valores
+            for index,row in df.iterrows():
+                if re.search('-',row['Quantidade (Kg)']):
+                    df.drop(index, inplace=True)
+            df.dropna(axis=0, how='any', subset=None, inplace=True)
+            df['ano'] = df['ano'].astype(int)
+
+            # Tratamento de dados: Renomeando e reorganizando as colunas
+            df = df.rename(columns={'classificacao_derivado':'Classificacao Derivado', 'ano':'Ano' })
+            df = df.reindex(['Classificacao Derivado', 'Países', 'Quantidade (Kg)', 'Valor (US$)','Ano'],axis=1)
+            
             dfs.append(df)
-    
     return pd.concat(dfs)
