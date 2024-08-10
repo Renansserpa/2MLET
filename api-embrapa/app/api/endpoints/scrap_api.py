@@ -41,9 +41,9 @@ def api_scrape_producao(ano: Optional[int] = Query(None), db: Session = Depends(
     
     for _, row in data.iterrows():
         db_data = ProductionScrapedData(
-            title=row['Produto'],
+            titulo=row['Produto'],
             ano=row['ano'],
-            quantity=row['Quantidade (L.)']
+            quantidade=row['Quantidade (L.)']
         )
         db.add(db_data)
     db.commit()
@@ -69,9 +69,9 @@ def api_scrap_comercializacao(ano: Optional[int] = Query(None), db: Session = De
     
     for _, row in data.iterrows():
         db_data = ComercializationScrapedData(
-            title=row['Produto'],
+            titulo=row['Produto'],
             ano=row['ano'],
-            quantity=row['Quantidade (L.)']
+            quantidade=row['Quantidade (L.)']
         )
         db.add(db_data)
     db.commit()
@@ -131,7 +131,7 @@ def api_scrap_importacao(ano: Optional[int] = Query(None), db: Session = Depends
             paises=row['Países'],
             valor=row['Valor (US$)'],
             ano=row['ano'],
-            quantity=row['Quantidade (Kg)'],
+            quantidade=row['Quantidade (Kg)'],
             classificacao_derivado=row['classificacao_derivado']
         )
         db.add(db_data)
@@ -161,7 +161,7 @@ def api_scrap_exportacao(ano: Optional[int] = Query(None), db: Session = Depends
             paises=row['Países'],
             valor=row['Valor (US$)'],
             ano=row['ano'],
-            quantity=row['Quantidade (Kg)'],
+            quantidade=row['Quantidade (Kg)'],
             classificacao_derivado=row['classificacao_derivado']
         )
         db.add(db_data)
