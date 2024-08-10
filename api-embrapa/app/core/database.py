@@ -5,8 +5,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-SENHA_BD = os.environ['SENHA_BD']
-DATABASE_URL = os.getenv("DATABASE_URL", f"mysql+mysqlconnector://root:{SENHA_BD}@localhost:3306/root")
+DATABASE_URL = "mysql+mysqlconnector://admin:admin123@embrapa.c5wqsiq46nxp.us-east-2.rds.amazonaws.com/embrapa"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
