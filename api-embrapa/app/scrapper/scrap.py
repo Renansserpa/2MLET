@@ -87,7 +87,45 @@ def structure_table(soup: BeautifulSoup, table_attr: str) -> pd.DataFrame:
         df = pd.DataFrame(df)
         return df
     
+##################### Funções de tratamento de dados #####################
+def tipo_produto_as_column(df: pd.DataFrame) -> pd.DataFrame:
+    """Faz com que valores de texto em maiúsculo da primeira coluna se tornem valores em uma nova coluna.
 
+    Arguments:
+        df {pd.DataFrame} -- Dataframe
+    """
+    coluna = df.columns[0]
+    for index,row in df.iterrows():
+        if row[coluna].isupper():
+            tipo_produto = df.loc[index,coluna].capitalize()
+            df.loc[index,'tipo_produto'] = tipo_produto
+        else:
+            df.loc[index,'tipo_produto'] = tipo_produto
+            
+    # Elimina linhas que registram o valor total do tipo do produto        
+    df = df[~df[coluna].str.isupper()]
+    return df
+
+def clean_numeric_column(df: pd.DataFrame, numeric_columns:list) -> pd.DataFrame:
+    """Transforma colunas numéricas que estão em texto para números enquanto que elimina pontos e linhas sem valores.
+
+    Arguments:
+        df {pd.DataFrame} -- Dataframe
+        numeric_columns {list} -- Lista com nomes de colunas a receberem o tratamento de limpeza
+    """
+    for column in numeric_columns:
+        
+        # Remoção de pontos nos números
+        df[column] = df[column].str.replace('.','')
+        
+        # Eliminação de registros sem valores
+        df = df[(~df[column].str.contains('-')) & (~df[column].str.contains('nd')) & (~df[column].str.contains('\*'))].dropna(axis=0, how='any')
+        
+        # Troca do tipo do dado para número
+        df[column] = df[column].astype(int)
+    return df
+
+##################### Funções de scraping de cada aba #####################
 def scrap_producao() -> pd.DataFrame:
     """ Gera um dataframe com dados de tabelas de todos os anos disponíveis, da aba produção do site da Embrapa.
     """
@@ -101,7 +139,11 @@ def scrap_producao() -> pd.DataFrame:
         df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano)
         dfs.append(df)
 
-    return pd.concat(dfs)
+    # Tratamento final de dados
+    cleaned_df = pd.concat(dfs).reset_index(drop= True)
+    cleaned_df = tipo_produto_as_column(cleaned_df)
+    cleaned_df = clean_numeric_column(cleaned_df, ['Quantidade (L.)'])
+    return cleaned_df
 
 
 def scrap_processamento() -> pd.DataFrame:
@@ -128,7 +170,11 @@ def scrap_processamento() -> pd.DataFrame:
                 
             dfs.append(df)
 
-    return pd.concat(dfs)
+    # Tratamento final de dados
+    cleaned_df = pd.concat(dfs).reset_index(drop= True)
+    cleaned_df = tipo_produto_as_column(cleaned_df)
+    cleaned_df = clean_numeric_column(cleaned_df, ['Quantidade (Kg)'])
+    return cleaned_df
 
 
 def scrap_comercializacao() -> pd.DataFrame:
@@ -144,7 +190,11 @@ def scrap_comercializacao() -> pd.DataFrame:
         df = structure_table(soup = soup, table_attr = "tb_base tb_dados").assign(ano = ano)
         dfs.append(df)
     
-    return pd.concat(dfs)
+    # Tratamento final de dados
+    cleaned_df = pd.concat(dfs).reset_index(drop= True)
+    cleaned_df = tipo_produto_as_column(cleaned_df)
+    cleaned_df = clean_numeric_column(cleaned_df, ['Quantidade (L.)'])
+    return cleaned_df
 
 
 def scrap_importacao() -> pd.DataFrame:
