@@ -7,4 +7,5 @@ class ProductionScrapedData(Base):
     id = Column(Integer, primary_key=True, index=True)
     titulo = Column(String(255), index=True)
     ano = Column(Integer)
-    quantidade = Column(String(255), nullable=True)
+    quantidade = Column(Integer)
+    tipo_produto = (Column(String(255), nullable=True))

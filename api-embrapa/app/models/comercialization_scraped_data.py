@@ -8,3 +8,4 @@ class ComercializationScrapedData(Base):
     titulo = Column(String(255), index=True)
     ano = Column(Integer)
     quantidade = Column(String(255), nullable=True)
+    tipo_produto = (Column(String(255), nullable=True))
