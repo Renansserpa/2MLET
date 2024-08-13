@@ -122,7 +122,6 @@ def clean_numeric_column(df: pd.DataFrame, numeric_columns:list) -> pd.DataFrame
         df = df[(~df[column].str.contains('-')) & 
         (~df[column].str.contains('nd')) & 
         (~df[column].str.contains(r'\*'))].dropna(axis=0, how='any')
-
         
         # Troca do tipo do dado para número
         df[column] = df[column].astype(int)
