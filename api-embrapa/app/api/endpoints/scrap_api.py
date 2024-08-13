@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import Annotated
 from sqlalchemy.orm import Session
 from app.scrapper.scrap import scrap_producao, scrap_processamento, scrap_comercializacao, scrap_importacao, scrap_exportacao 
 from app.core.database import SessionLocal
@@ -7,10 +8,13 @@ from app.models.comercialization_scraped_data import ComercializationScrapedData
 from app.models.processing_scraped_data import ProcessingScrapedData
 from app.models.import_scraped_data import ImportScrapedData
 from app.models.export_scraped_data import ExportScrapedData
+from app.api.authentication.security import get_current_user
+from app.models.users_db import User
 import pandas as pd
 from typing import Optional
 
 router = APIRouter()
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 def get_db():
     db = SessionLocal()
@@ -20,11 +24,13 @@ def get_db():
         db.close()
 
 @router.post('/producao')
-def api_scrape_producao(ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
+def api_scrape_producao(current_user: CurrentUser, ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
     # Realiza o método post no endpoint /scrap/producao para iniciar o scrap e pegar os dados
     # da aba produção no site da Embrapa, para salvar esses dados em um banco
     #
     # Arguments:
+    #  current_user: É um parâmetro contendo o usuario atual logado na API (se nao estiver logado nao sera possivel
+    #        utilizar o metodo)
     #   ano: É um parâmetro opcional para caso você deseje fazer um scrap de um ano específico, caso o valor 
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
@@ -51,11 +57,13 @@ def api_scrape_producao(ano: Optional[int] = Query(None), db: Session = Depends(
     return {"message": "Production data scraped and stored successfully"}
 
 @router.post('/comercializacao')
-def api_scrap_comercializacao(ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
+def api_scrap_comercializacao(current_user: CurrentUser, ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
     # Realiza o método post no endpoint /scrap/comercializacao para iniciar o scrap e pegar os dados
     # da aba comercialização no site da Embrapa, para salvar esses dados em um banco
     #
     # Arguments:
+    #  current_user: É um parâmetro contendo o usuario atual logado na API (se nao estiver logado nao sera possivel
+    #        utilizar o metodo)
     #   ano: É um parâmetro opcional para caso você deseje fazer um scrap de um ano específico, caso o valor 
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
@@ -69,7 +77,7 @@ def api_scrap_comercializacao(ano: Optional[int] = Query(None), db: Session = De
     
     for _, row in data.iterrows():
         db_data = ComercializationScrapedData(
-            titulo=row['Produto'],
+            title=row['Produto'],
             ano=row['ano'],
             quantidade=row['Quantidade (L.)']
         )
@@ -79,11 +87,13 @@ def api_scrap_comercializacao(ano: Optional[int] = Query(None), db: Session = De
     return {'message": "Comercialization data scraped and stored successfully'}
 
 @router.post('/processamento')
-def api_scrap_processamento(ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
+def api_scrap_processamento(current_user: CurrentUser, ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
     # Realiza o método post no endpoint /scrap/processamento para iniciar o scrap e pegar os dados
     # da aba processamento no site da Embrapa, para salvar esses dados em um banco
     #
     # Arguments:
+    #  current_user: É um parâmetro contendo o usuario atual logado na API (se nao estiver logado nao sera possivel
+    #        utilizar o metodo)
     #   ano: É um parâmetro opcional para caso você deseje fazer um scrap de um ano específico, caso o valor 
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
@@ -110,11 +120,13 @@ def api_scrap_processamento(ano: Optional[int] = Query(None), db: Session = Depe
     return {'message": "Processing data scraped and stored successfully'}
 
 @router.post('/importacao')
-def api_scrap_importacao(ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
+def api_scrap_importacao(current_user: CurrentUser, ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
     # Realiza o método post no endpoint /scrap/importacao para iniciar o scrap e pegar os dados
     # da aba importação no site da Embrapa, para salvar esses dados em um banco
     #
     # Arguments:
+    #  current_user: É um parâmetro contendo o usuario atual logado na API (se nao estiver logado nao sera possivel
+    #        utilizar o metodo)
     #   ano: É um parâmetro opcional para caso você deseje fazer um scrap de um ano específico, caso o valor 
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
@@ -140,11 +152,13 @@ def api_scrap_importacao(ano: Optional[int] = Query(None), db: Session = Depends
 
 
 @router.post('/exportacao')
-def api_scrap_exportacao(ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
+def api_scrap_exportacao(current_user: CurrentUser, ano: Optional[int] = Query(None), db: Session = Depends(get_db)):
     # Realiza o método post no endpoint /scrap/exportacao para iniciar o scrap e pegar os dados
     # da aba exportação no site da Embrapa, para salvar esses dados em um banco
     #
     # Arguments:
+    #  current_user: É um parâmetro contendo o usuario atual logado na API (se nao estiver logado nao sera possivel
+    #        utilizar o metodo)
     #   ano: É um parâmetro opcional para caso você deseje fazer um scrap de um ano específico, caso o valor 
     #        seja nulo, será adicionado todos os anos disponíveis 
     #   db: É apenas um parâmetro para que seja possível iniciar a sessão no banco de dados
