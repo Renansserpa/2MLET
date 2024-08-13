@@ -1,0 +1,475 @@
+openapi: "3.1.0"
+info:
+  title: "API Embrapa"
+  version: "0.1.0"
+tags:
+  - name: Autenticacao
+    description: Endpoints relacionados a autenticacao de usuarios.
+  - name: Scrap
+    description: Endpoints relacionados ao scrap de dados da Embrapa.
+  - name: Users
+    description: Endpoints relacionado a manipulacao e criacão de usuarios
+  - name: Padrao
+    description: Usado para a requisição dos dados do banco relacionados as abas do site 
+paths:
+  /users/create:
+    post:
+      tags:
+        - "Users"
+      summary: "Criar usuario"
+      operationId: "create_user_users_create_post"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSchema"
+      responses:
+        '201':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /users/query:
+    get:
+      tags:
+        - "Users"
+      summary: "Consultar usuario"
+      operationId: "query_user_users_query_get"
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            format: "email"
+            title: "Email"
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /users/update/{user_id}:
+    put:
+      tags:
+        - "Users"
+      summary: "Atualizar Usuario"
+      operationId: "update_user_users_update__user_id__put"
+      security:
+        - OAuth2PasswordBearer: []
+      parameters:
+        - name: "user_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "User Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSchema"
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPublic"
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /users/delete/{user_id}:
+    delete:
+      tags:
+        - "Users"
+      summary: "Deletar usuario"
+      operationId: "delete_user_users_delete__user_id__delete"
+      security:
+        - OAuth2PasswordBearer: []
+      parameters:
+        - name: "user_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "User Id"
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /auth/token:
+    post:
+      tags:
+        - "Autenticacao"
+      summary: "Login para pegar o token de acesso"
+      operationId: "login_for_access_token_auth_token_post"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Body_login_for_access_token_auth_token_post"
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /scrap/producao:
+    post:
+      tags:
+        - "Scrap"
+      summary: "Endpoint usado para pegar os dados da aba producao e salvar no banco de dados"
+      operationId: "api_scrape_producao_scrap_producao_post"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /scrap/comercializacao:
+    post:
+      tags:
+        - "Scrap"
+      summary: "Endpoint usado para pegar os dados da aba comercializacao e salvar no banco de dados"
+      operationId: "api_scrap_comercializacao_scrap_comercializacao_post"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /scrap/processamento:
+    post:
+      tags:
+        - "Scrap"
+      summary: "Endpoint usado para pegar os dados da aba processamento e salvar no banco de dados"
+      operationId: "api_scrap_processamento_scrap_processamento_post"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /scrap/importacao:
+    post:
+      tags:
+        - "Scrap"
+      summary: "Endpoint usado para pegar os dados da aba importacao e salvar no banco de dados"
+      operationId: "api_scrap_importacao_scrap_importacao_post"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /scrap/exportacao:
+    post:
+      tags:
+        - "Scrap"
+      summary: "Endpoint usado para pegar os dados da aba exportacao e salvar no banco de dados"
+      operationId: "api_scrap_exportacao_scrap_exportacao_post"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /producao:
+    get:
+      tags: 
+       - "Usado para a requisicao dos dados do banco relacionados a producao "
+      summary: "Getproducao"
+      operationId: "getProducao_producao_get"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /processamento:
+    get:
+      tags: 
+       - "Padrao"
+      summary: "Usado para a requisicao dos dados do banco relacionados a processamento"
+      operationId: "getProcessamento_processamento_get"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /comercializacao:
+    get:
+      tags: 
+       - "Padrao"
+      summary: "Usado para a requisicao dos dados do banco relacionados a comercializacao"
+      operationId: "getComercializacao_comercializacao_get"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /importacao:
+    get:
+      tags: 
+       - "Padrao"
+      summary: "Usado para a requisicao dos dados do banco relacionados a importacao"
+      operationId: "getImportacao_importacao_get"
+      security:
+        - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /exportacao:
+    get:
+      tags: 
+       - "Padrao"
+      summary: "Usado para a requisicao dos dados do banco relacionados a exportacao"
+      operationId: "getExportacao_exportacao_get"
+      security:
+        - OAuth2PasswordBearer: []
+      parameters:
+        - name: "ano"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            title: "Ano"
+            nullable: true
+      responses:
+        '200':
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+components:
+  schemas:
+    Body_login_for_access_token_auth_token_post:
+      type: object
+      title: Body_login_for_access_token_auth_token_post
+      required:
+        - username
+        - password
+      properties:
+        grant_type:
+          title: Grant Type
+          type: string
+          enum: ["password", null]
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+        scope:
+          type: string
+          title: Scope
+          default: ""
+        client_id:
+          title: Client Id
+          type: string
+          nullable: true
+        client_secret:
+          title: Client Secret
+          type: string
+          nullable: true
+    HTTPValidationError:
+      type: object
+      title: HTTPValidationError
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationError"
+    Message:
+      type: object
+      title: Message
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          title: Message
+    Token:
+      type: object
+      title: Token
+      required:
+        - access_token
+        - token_type
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+    UserPublic:
+      type: object
+      title: UserPublic
+      required:
+        - id
+        - email
+      properties:
+        id:
+          type: integer
+          title: Id
+        email:
+          type: string
+          format: email
+          title: Email
+    UserSchema:
+      type: object
+      title: UserSchema
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          title: Password
+    ValidationError:
+      type: object
+      title: ValidationError
+      required:
+        - loc
+        - msg
+        - type
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            type: string
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+  securitySchemes:
+    OAuth2PasswordBearer:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: "auth/token"
+          scopes: {}

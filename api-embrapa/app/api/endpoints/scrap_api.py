@@ -49,7 +49,8 @@ def api_scrape_producao(current_user: CurrentUser, ano: Optional[int] = Query(No
         db_data = ProductionScrapedData(
             titulo=row['Produto'],
             ano=row['ano'],
-            quantidade=row['Quantidade (L.)']
+            quantidade=row['Quantidade (L.)'],
+            tipo_produto=row['tipo_produto']
         )
         db.add(db_data)
     db.commit()
@@ -77,7 +78,7 @@ def api_scrap_comercializacao(current_user: CurrentUser, ano: Optional[int] = Qu
     
     for _, row in data.iterrows():
         db_data = ComercializationScrapedData(
-            title=row['Produto'],
+            titulo=row['Produto'],
             ano=row['ano'],
             quantidade=row['Quantidade (L.)']
         )
