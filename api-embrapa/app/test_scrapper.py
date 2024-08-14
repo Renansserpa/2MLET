@@ -35,14 +35,9 @@ def test_producao(producao_data):
     
     required_columns = {
         "Produto": ptypes.is_string_dtype,
-<<<<<<< HEAD
         "Quantidade (L.)": ptypes.is_numeric_dtype,
         "ano": ptypes.is_numeric_dtype,
         'tipo_produto': ptypes.is_string_dtype
-=======
-        "Quantidade (L.)": ptypes.is_string_dtype,
-        "ano": ptypes.is_numeric_dtype
->>>>>>> 472e93e0a1ed634b966fe0836d672b559d1209d3
     }
     
     # Valida se dataframe não está vazio
@@ -66,16 +61,10 @@ def test_processamento(processamento_data):
     
     required_columns = {
         "Cultivar": ptypes.is_string_dtype,
-<<<<<<< HEAD
         "Quantidade (Kg)": ptypes.is_numeric_dtype,
         "ano": ptypes.is_numeric_dtype,
         "classificacao_uva": ptypes.is_string_dtype,
         'tipo_produto': ptypes.is_string_dtype
-=======
-        "Quantidade (Kg)": ptypes.is_string_dtype,
-        "ano": ptypes.is_numeric_dtype,
-        "classificacao_uva": ptypes.is_string_dtype
->>>>>>> 472e93e0a1ed634b966fe0836d672b559d1209d3
     }
     
     # Valida se dataframe não está vazio
@@ -99,14 +88,9 @@ def test_comercializacao(comercializacao_data):
     
     required_columns = {
         "Produto": ptypes.is_string_dtype,
-<<<<<<< HEAD
         "Quantidade (L.)": ptypes.is_numeric_dtype,
         "ano": ptypes.is_numeric_dtype,
         'tipo_produto': ptypes.is_string_dtype
-=======
-        "Quantidade (L.)": ptypes.is_string_dtype,
-        "ano": ptypes.is_numeric_dtype
->>>>>>> 472e93e0a1ed634b966fe0836d672b559d1209d3
     }
     
     # Valida se dataframe não está vazio
