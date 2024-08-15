@@ -80,7 +80,8 @@ def api_scrap_comercializacao(current_user: CurrentUser, ano: Optional[int] = Qu
         db_data = ComercializationScrapedData(
             titulo=row['Produto'],
             ano=row['ano'],
-            quantidade=row['Quantidade (L.)']
+            quantidade=row['Quantidade (L.)'],
+            tipo_produto=row['tipo_produto']
         )
         db.add(db_data)
     db.commit()
